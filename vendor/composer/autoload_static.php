@@ -30,8 +30,8 @@ class ComposerStaticInit55be638e3245a47d28f13a5c033c5a38
     public static $prefixDirsPsr4 = array (
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -53,6 +53,13 @@ class ComposerStaticInit55be638e3245a47d28f13a5c033c5a38
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'SeaportAcmeTicketing\\Admin' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Admin.php',
+        'SeaportAcmeTicketing\\ApiClient' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/ApiClient.php',
+        'SeaportAcmeTicketing\\Controller' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Controller.php',
+        'SeaportAcmeTicketing\\Helpers' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Helpers.php',
+        'SeaportAcmeTicketing\\Menus' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Menus.php',
+        'SeaportAcmeTicketing\\Pages' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Pages.php',
+        'SeaportAcmeTicketing\\Template' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Template.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

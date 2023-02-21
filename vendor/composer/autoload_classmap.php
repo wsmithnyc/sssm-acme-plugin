@@ -7,4 +7,11 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'SeaportAcmeTicketing\\Admin' => $baseDir . '/includes/SeaportAcmeTicketing/Admin.php',
+    'SeaportAcmeTicketing\\ApiClient' => $baseDir . '/includes/SeaportAcmeTicketing/ApiClient.php',
+    'SeaportAcmeTicketing\\Controller' => $baseDir . '/includes/SeaportAcmeTicketing/Controller.php',
+    'SeaportAcmeTicketing\\Helpers' => $baseDir . '/includes/SeaportAcmeTicketing/Helpers.php',
+    'SeaportAcmeTicketing\\Menus' => $baseDir . '/includes/SeaportAcmeTicketing/Menus.php',
+    'SeaportAcmeTicketing\\Pages' => $baseDir . '/includes/SeaportAcmeTicketing/Pages.php',
+    'SeaportAcmeTicketing\\Template' => $baseDir . '/includes/SeaportAcmeTicketing/Template.php',
 );

@@ -8,11 +8,17 @@ Author: William Mallick
 Author URI: wmallick@outlook.com
 License: GPL2
 */
-
-// Exit if accessed directly
+//require the autoload file made by composer
+//file composer.json will include the class maps for this plugin's classes
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
+require_once __DIR__ . '/vendor/autoload.php';
+
+use SeaportAcmeTicketing\Menus;
+
+// Exit if accessed directly
+Menus::registerAdminMenu();
 
 

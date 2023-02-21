@@ -1,5 +1,9 @@
 {
     "require": {
         "guzzlehttp/guzzle": "^7.5"
+    },
+    "autoload": {
+        "classmap": ["includes/"]
     }
+
 }
