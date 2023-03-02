@@ -20,15 +20,13 @@ class Menus {
 			6
 		);
 
-
 		add_submenu_page(
 			self::PARENT_SLUG,
 			'Acme Ticketing: Events',
 			'Events',
 			'manage_options',
-			'acme_ticketing/events.php',
-			'test',
-			[ Admin::class, 'acme_ticketing_admin_page' ]
+			'acme_ticketing_events.php',
+			[ Admin::class, 'acme_ticketing_events_page' ]
 		);
 
 		add_submenu_page(
@@ -36,9 +34,8 @@ class Menus {
 			'Acme Ticketing: Configuration',
 			'Config',
 			'manage_options',
-			'acme_ticketing/events.php',
-			'test',
-			[ Admin::class, 'acme_ticketing_admin_page' ]
+			'acme_ticketing_config.php',
+			[ Admin::class, 'acme_ticketing_config_page' ]
 		);
 	}
 }

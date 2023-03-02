@@ -1,9 +1,13 @@
 {
     "require": {
-        "guzzlehttp/guzzle": "^7.5"
+        "guzzlehttp/guzzle": "^7.5",
+        "nesbot/carbon": "^2.66"
     },
     "autoload": {
         "classmap": ["includes/"]
+    },
+    "config": {
+        "platform-check": false
     }
 
 }
