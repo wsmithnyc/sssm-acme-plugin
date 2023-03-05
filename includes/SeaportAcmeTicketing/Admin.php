@@ -43,6 +43,16 @@ class Admin {
 			<h2>Acme Ticketing Settings</h2>
 		</div>';
 
+        require_once (__DIR__ . '/../partials/js_run_sync.php');
 
+    }
+
+    public static function acme_ticketing_log_page()
+    {
+        echo '<div class="wrap">
+			<h2>Acme Ticketing System Log</h2>
+		</div>';
+
+        require_once (__DIR__ . '/../partials/activity_log.php');
     }
 }

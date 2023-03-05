@@ -15,8 +15,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+add_action('admin_head', 'my_custom_fonts');
+
+function my_custom_fonts() {
+    echo '<style>
+    table,  {
+      min-width: 300px;
+    } 
+    
+    td, th {
+        padding: 4px 20px 4px 4px;
+        font-size: 16px;
+        text-align: left;
+    }
+
+  </style>';
+}
+
 require_once __DIR__ . '/vendor/autoload.php';
 
+use SeaportAcmeTicketing\Controller;
 use SeaportAcmeTicketing\Menus;
 
 
@@ -30,3 +48,9 @@ register_activation_hook(__FILE__, ['SeaportAcmeTicketing\Activation', 'do_activ
 
 register_uninstall_hook(    __FILE__, array( 'SeaportAcmeTicketing\Activation', 'do_uninstall' ) );
 
+add_action( 'wp_ajax_sync_acme_data', 'acme_ticketing_sync_acme_data');
+
+function acme_ticketing_sync_acme_data()
+{
+    (new Controller())->syncAcmeDataRequest();
+}

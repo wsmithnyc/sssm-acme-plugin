@@ -37,5 +37,23 @@ class Menus {
 			'acme_ticketing_config.php',
 			[ Admin::class, 'acme_ticketing_config_page' ]
 		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			'Acme Ticketing: Data Sync',
+			'Sync',
+			'manage_options',
+			'acme_ticketing_sync.php',
+			[ Admin::class, 'acme_ticketing_sync_page' ]
+		);
+
+        add_submenu_page(
+            self::PARENT_SLUG,
+            'Acme Ticketing: System Log',
+            'Logs',
+            'manage_options',
+            'acme_ticketing_log.php',
+            [ Admin::class, 'acme_ticketing_log_page' ]
+        );
 	}
 }

@@ -12,7 +12,7 @@ class ApiClient {
 	public string $baseUrl;
 	public string $apiKey;
 	protected GuzzleHttp\ClientInterface $client;
-	public bool $verbose_logging_mode = false;
+	public bool $verbose_logging_mode = true;
 
 	public function __construct()
 	{
@@ -22,52 +22,61 @@ class ApiClient {
         $this->baseUrl = Database::getSettings(Constants::SETTING_API_BASE_URL);
 
         if (str_ends_with($this->baseUrl, '/')) {
-            $this->baseUrl = substr($this->baseUrl, -1);
+            $this->baseUrl = substr($this->baseUrl, 0,-1);
         }
 
 		//get api key from settings
         $this->apiKey = Database::getSettings(Constants::SETTING_API_KEY);
-	}
+
+    }
 
 	//*********************************  Acme API Endpoints **********************************/
 
-	public function getTemplates()
-	{
+	public function getTemplates(): string
+    {
 		$endpoint = '/v1/b2b/event/template';
+
+        return $this->getAcmeData($endpoint);
 	}
 
-	public function getEventCalendarStatements(?int $currentPage = 1)
-	{
+	public function getEventCalendarStatements(?array $params = []): string
+    {
         $endpoint = '/v2/b2b/event/instances/statements';
+
+        return $this->getAcmeData($endpoint, $params);
 	}
 
-	public function getCalendarByTemplateId(string $templateId)
-	{
+	public function getCalendarByTemplateId(string $templateId): ?string
+    {
 		if (empty($templateId)) {
 			return null;
 		}
 
 		$endpoint =  "/v1/b2c/event/templates/{$templateId}/calendar";
+
+        return $this->getAcmeData($endpoint);
 	}
 
-	public function getNextAvailableEventByTemplateId(string $templateId)
-	{
+	public function getNextAvailableEventByTemplateId(string $templateId): ?string
+    {
 		if (empty($templateId)) {
 			return null;
 		}
 
 		$endpoint = "/v1/b2c/events/{$templateId}/nextAvailable";
+
+        return $this->getAcmeData($endpoint);
 	}
 
 	public function getAcmeData(string $endpoint, ?array $params = []): string
 	{
-
         try {
-            $this->request('GET', $endpoint);
+            $response = $this->request('GET', $endpoint, $params);
 
+            return $response->getBody();
 
         } catch (GuzzleException $ex) {
-
+            Log::guzzleException($ex);
         }
 
         return  json_encode(['error'=>true]);
@@ -99,8 +108,8 @@ class ApiClient {
         $options = [
             'headers' => [
                 Constants::API_AUTH_HEADER => $this->apiKey,
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
+                //'Accept' => 'application/json',
+                //'Content-Type' => 'application/json',
             ],
         ];
 
@@ -113,14 +122,15 @@ class ApiClient {
         }
 
         $url = $this->baseUrl . $path;
+
         $response = $this->client->request($method, $url, $options);
 
         if ($this->verbose_logging_mode) {
             $status_code = $response->getStatusCode();
             $options_string = json_encode($options);
-            $log_entry = "Brandfolder request. Method: $method. Requested URL: $url. Options: $options_string. Response code: $status_code.";
+            $log_entry = "Acme API request. Method: $method. Requested URL: $url. Options: $options_string. Response code: $status_code.";
             $log_entry = str_replace($this->apiKey, '[[API-KEY-REDACTED]]', $log_entry);
-            $this->log_data[] = $log_entry;
+            Log::debug($log_entry);
         }
 
         return $response;
