@@ -15,9 +15,15 @@ class Admin {
 
     public static function acme_ticketing_events_page()
     {
+        $data = (new Database())->getEventTemplates();
+
+        $return = var_export($data, true);
+
         echo '<div class="wrap">
 			<h2>Acme Events List</h2>
 		</div>';
+
+        echo "<div class='wrap'>$return</div>";
     }
 
     public static function acme_ticketing_config_page()

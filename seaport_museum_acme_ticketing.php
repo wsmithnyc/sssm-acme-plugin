@@ -15,9 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action('admin_head', 'my_custom_fonts');
+add_action('admin_head', 'acme_ticketing_admin_css');
 
-function my_custom_fonts() {
+function acme_ticketing_admin_css() {
     echo '<style>
     table,  {
       min-width: 300px;
@@ -27,6 +27,10 @@ function my_custom_fonts() {
         padding: 4px 20px 4px 4px;
         font-size: 16px;
         text-align: left;
+    }
+    
+    table.wp-list-table.fixed {
+       table-layout: auto !important;
     }
 
   </style>';
@@ -54,3 +58,5 @@ function acme_ticketing_sync_acme_data()
 {
     (new Controller())->syncAcmeDataRequest();
 }
+
+add_filter( 'query_vars', 'acme_ticketing_query_vars', 1);

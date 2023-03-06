@@ -27,4 +27,10 @@ class Constants
     //api
     const API_AUTH_HEADER = 'x-acme-api-key';
 
+
+    //posts
+    const SSSM_POST_TYPE = 'sssm-page';
+    const CUSTOM_FIELD_TEMPLATE = 'acme-template-id';
+    const CUSTOM_FIELD_BOOK_NOW = 'book-now-url';
+
 }

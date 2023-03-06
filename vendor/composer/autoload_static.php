@@ -98,6 +98,7 @@ class ComposerStaticInit55be638e3245a47d28f13a5c033c5a38
         'SeaportAcmeTicketing\\Database' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Database.php',
         'SeaportAcmeTicketing\\Helpers' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Helpers.php',
         'SeaportAcmeTicketing\\Log' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Log.php',
+        'SeaportAcmeTicketing\\LogTable' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/LogTable.php',
         'SeaportAcmeTicketing\\Menus' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Menus.php',
         'SeaportAcmeTicketing\\Pages' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Pages.php',
         'SeaportAcmeTicketing\\Template' => __DIR__ . '/../..' . '/includes/SeaportAcmeTicketing/Template.php',

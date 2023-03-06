@@ -35,9 +35,21 @@ class Database {
 	 *
 	 * @return void
 	 */
-	public function getEvents(array $filters = [])
+	public function getEventTemplates(array $filters = [])
 	{
+        $table = $this->getTemplateTableName();
+        $sql = "SELECT id, name, short_description, admission_type, review_state, starts_at, ends_at FROM {$table} ORDER BY name";
 
+        $templates = $this->wpdb->get_results($sql);
+
+        $data = [];
+
+        foreach ($templates as $template) {
+            $data[$template->id] = $template;
+            $data[$template->id]->posts = $this->getLinkedPostsByTemplateID($template->id);
+        }
+
+        return $data;
 	}
 
 	/**
@@ -79,15 +91,52 @@ class Database {
         return $list;
     }
 
+    /************************** WordPress Posts Queries **********************/
+    public function getLinkedPostsByTemplateID(string $templateId): array
+    {
+        return get_posts([
+            'numberposts' => -1,
+            'post_type' => Constants::SSSM_POST_TYPE,
+            'meta_key' => Constants::CUSTOM_FIELD_TEMPLATE,
+            'meta_value' => $templateId,
+        ]);
+    }
+
+    public function getUnlinkedPosts()
+    {
+
+
+    }
+
     //***********************  Log Report ***********************************/
-    public static function getLogData(int $page)
+    public static function getLogData(
+        int     $page,
+        int     $perPage,
+        ?string $sortColumn = 'id',
+        ?string $sortDirection = 'desc'
+    ): array|object|null {
+        $instance = new Database();
+
+        $table = $instance->log_table_name;
+        $sql = "SELECT id, type, message, created_at FROM {$table} ORDER BY $sortColumn $sortDirection";
+
+        //apply paging
+        if (!empty($page) && !empty($perPage)) {
+            $offset = ($page - 1) * $perPage;
+            $sql .= " LIMIT $perPage OFFSET $offset";
+        }
+
+        return $instance->wpdb->get_results($sql, 'ARRAY_A');
+    }
+
+    public static function getLogDataRowCount(): ?string
     {
         $instance = new Database();
 
         $table = $instance->log_table_name;
-        $sql = "SELECT id, type, message, created_at FROM {$table} ORDER BY id DESC";
+        $sql = "SELECT count(*) as total_rows FROM {$table}";
 
-        return $instance->wpdb->get_results($sql);
+        return $instance->wpdb->get_var($sql);
     }
 
     /************************** Data Write ***********************************/

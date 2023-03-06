@@ -18,6 +18,7 @@ return array(
     'SeaportAcmeTicketing\\Database' => $baseDir . '/includes/SeaportAcmeTicketing/Database.php',
     'SeaportAcmeTicketing\\Helpers' => $baseDir . '/includes/SeaportAcmeTicketing/Helpers.php',
     'SeaportAcmeTicketing\\Log' => $baseDir . '/includes/SeaportAcmeTicketing/Log.php',
+    'SeaportAcmeTicketing\\LogTable' => $baseDir . '/includes/SeaportAcmeTicketing/LogTable.php',
     'SeaportAcmeTicketing\\Menus' => $baseDir . '/includes/SeaportAcmeTicketing/Menus.php',
     'SeaportAcmeTicketing\\Pages' => $baseDir . '/includes/SeaportAcmeTicketing/Pages.php',
     'SeaportAcmeTicketing\\Template' => $baseDir . '/includes/SeaportAcmeTicketing/Template.php',

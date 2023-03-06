@@ -3,54 +3,39 @@
 namespace SeaportAcmeTicketing;
 
 class Helpers {
-    /**
-     * Builds an HTML table from a query result set
-     *
-     *
-     * @param array $data
-     * @param string|null $tableClass
-     * @return string
-     */
-    public static function queryResultsToHtml(array $data, ?string $tableClass = ''): string
+    public static function getTableSortDirection()
     {
-        if (empty($data)) {
-            return '';
-        }
-
-        $headerLoaded = false;
-        $header = '';
-        $body = '';
-        $bodyRow = '';
-
-        foreach ($data as $row) {
-            foreach ($row as $key => $value) {
-                if (!$headerLoaded) {
-                    $column = self::dbColumnToTableHeader($key);
-                    $header .= "<th>$column</th>";
-                }
-
-                $value = trim(htmlentities($value));
-                $bodyRow .= "<td>$value</td>";
-            }
-
-            $body .= "<tr>$bodyRow</tr>\n";
-            $headerLoaded = true;
-
-            $bodyRow = '';
-        }
-
-        $class = (!empty($tableClass)) ? "class='$tableClass'" : '';
-        return "<table {$class}><tr>{$header}</tr>\n{$body}</table>";
+        $sortDirection = $_GET['order'] ?? 'desc';
+        return ($sortDirection == 'desc') ? 'desc' : 'asc';
     }
 
-    /**
-     * Transform DB Column names to display names for table headers
-     *
-     * @param string $dbColumn
-     * @return string
-     */
-    public static function dbColumnToTableHeader(string $dbColumn)
+    public static function getTableSortColumn(
+        ?array  $validDbColumns = [],
+        ?string $defaultColumn = 'id'
+    ) {
+        $sortColumn = $_GET['orderby'] ?? 'id';
+
+        return (in_array(
+            $sortColumn,
+            $validDbColumns
+        )) ? $sortColumn : $defaultColumn;
+    }
+
+    public static function getTablePage(): int
     {
-        return ucwords(str_replace('_', ' ', $dbColumn));
+        $paged = $_GET['paged'] ?? '1';
+
+        if ((empty($paged) || !is_numeric($paged))) {
+            return 1;
+        }
+
+        return (int)$paged;
+    }
+
+    public static function getTotalPagesFromRecordCount(
+        int $count,
+        int $perPage
+    ): int {
+        return (int)ceil($count / $perPage);
     }
 }
