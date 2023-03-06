@@ -23,6 +23,7 @@ class Constants
     const TABLE_EVENT_CALENDAR = 'acme_ticketing_event_calendar';
     const TABLE_LOG = 'acme_ticketing_log';
     const TABLE_SETTINGS = 'acme_ticketing_settings';
+    const TABLE_SYNC_LOG = 'acme_ticketing_sync_log';
 
     //api
     const API_AUTH_HEADER = 'x-acme-api-key';

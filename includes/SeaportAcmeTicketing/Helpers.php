@@ -13,7 +13,7 @@ class Helpers {
         ?array  $validDbColumns = [],
         ?string $defaultColumn = 'id'
     ) {
-        $sortColumn = $_GET['orderby'] ?? 'id';
+        $sortColumn = $_GET['orderby'] ?? $defaultColumn;
 
         return (in_array(
             $sortColumn,
@@ -36,6 +36,10 @@ class Helpers {
         int $count,
         int $perPage
     ): int {
+        if ($count <= $perPage) {
+            return 1;
+        }
+
         return (int)ceil($count / $perPage);
     }
 }

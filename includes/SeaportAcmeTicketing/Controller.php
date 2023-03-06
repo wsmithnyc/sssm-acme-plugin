@@ -192,6 +192,14 @@ class Controller {
 
     }
 
+    public function logSyncStatusStart(string $objectType)
+    {
 
+    }
+
+    public function logSyncStatusStop(int $syncLogId)
+    {
+
+    }
 
 }

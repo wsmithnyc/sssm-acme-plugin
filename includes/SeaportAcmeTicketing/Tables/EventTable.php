@@ -1,10 +1,12 @@
 <?php
 
-namespace SeaportAcmeTicketing;
+namespace SeaportAcmeTicketing\Tables;
 
+use SeaportAcmeTicketing\Database;
+use SeaportAcmeTicketing\Helpers;
 use WP_List_Table;
 
-class LogTable extends WP_List_Table
+class EventTable extends WP_List_Table
 {
     function __construct()
     {
@@ -25,10 +27,14 @@ class LogTable extends WP_List_Table
     function get_columns(): array
     {
         return [
-            'id' => __('ID'),
-            'type' => __('Event Type'),
-            'message' => __('Message'),
-            'created_at' => __('Timestamp'),
+            'id' => __('Template Id'),
+            'name' => __('Event Name'),
+            'short_description' => __('Short Description'),
+            'linked_posts' => __('Linked Posts'),
+            'admission_type' => __('Admission Type'),
+            'review_state' => __('Status'),
+            'starts_at' => __('Starts'),
+            'ends_at' => __('Runs Until'),
         ];
     }
 
@@ -40,17 +46,25 @@ class LogTable extends WP_List_Table
     {
         return [
             'id' => ['id', true],
-            'type' => ['type', false],
+            'name' => ['name', false],
+            'admission_type' => ['admission_type', false],
+            'review_state' => ['review_state', false],
+            'starts_at' => ['starts_at', false],
+            'ends_at' => ['ends_at', false],
         ];
     }
 
     function column_default($item, $column_name)
     {
         switch ($column_name) {
+            case 'linked_posts':
             case 'id':
-            case 'type':
-            case 'message':
-            case 'created_at':
+            case 'name':
+            case 'short_description':
+            case 'admission_type':
+            case 'review_state':
+            case 'starts_at':
+            case 'ends_at':
             default:
                 return $item[$column_name];
         }
@@ -67,14 +81,18 @@ class LogTable extends WP_List_Table
 
         $this->_column_headers = $this->get_column_info();
 
+        $sortable = $this->get_sortable_columns();
+
+        $safeColumns = array_keys($sortable);
+
         /* -- Sort Ordering parameters -- */
         $sortDirection = Helpers::getTableSortDirection();
-        $sortColumn = Helpers::getTableSortColumn(['id', 'type']);
+        $sortColumn = Helpers::getTableSortColumn($safeColumns);
 
         /* -- Pagination parameters -- */
         //Number of elements in your table?
         //return the total number of affected rows
-        $totalItems = Database::getLogDataRowCount();
+        $totalItems = Database::getTemplateDataRowCount();
         //How many to display per page?
         $perPage = 25;
         //Which page is this?
@@ -96,7 +114,6 @@ class LogTable extends WP_List_Table
         );
 
         $hidden = array();
-        $sortable = $this->get_sortable_columns();
         $primary  = 'id';
 
         /* -- Register the Columns -- */
@@ -106,9 +123,7 @@ class LogTable extends WP_List_Table
         $this->_column_headers = array($columns, $hidden, $sortable, $primary);
 
         /* -- Fetch the items -- */
-        $this->items = Database::getLogData(
-            $page, $perPage, $sortColumn, $sortDirection
-        );
+        $this->items = (new Database())->getEventTemplates($page, $perPage, $sortColumn, $sortDirection);
     }
 
     public function no_items() {

@@ -33,24 +33,61 @@ class Database {
 	 *
 	 * @param array $filters
 	 *
-	 * @return void
-	 */
-	public function getEventTemplates(array $filters = [])
-	{
+	 * @return array
+     */
+	public function getEventTemplates($page, $perPage, $sortColumn, $sortDirection): array
+    {
         $table = $this->getTemplateTableName();
-        $sql = "SELECT id, name, short_description, admission_type, review_state, starts_at, ends_at FROM {$table} ORDER BY name";
+        $sql = "SELECT id, name, short_description, admission_type, review_state, starts_at, ends_at FROM {$table} ORDER BY $sortColumn $sortDirection";
 
-        $templates = $this->wpdb->get_results($sql);
+        //apply paging
+        if (!empty($page) && !empty($perPage)) {
+            $offset = ($page - 1) * $perPage;
+            $sql .= " LIMIT $perPage OFFSET $offset";
+        }
+
+        $templates = $this->wpdb->get_results($sql, ARRAY_A);
 
         $data = [];
 
         foreach ($templates as $template) {
-            $data[$template->id] = $template;
-            $data[$template->id]->posts = $this->getLinkedPostsByTemplateID($template->id);
+            $data[$template['id']] = $template;
+            //get the posts related to this event template
+            $posts = $this->getLinkedPostsByTemplateID($template['id']);
+            //append the html list of posts as a new column to the data set
+            $data[$template['id']]['linked_posts'] = $this->getEventTablePostsList($posts);
         }
 
         return $data;
 	}
+
+    protected function getEventTablePostsList($posts)
+    {
+        if (empty($posts)) {
+            return '';
+        }
+
+        $html = '';
+
+        foreach ($posts as $post) {
+            $url = urldecode($post->guid);
+            $postTitle = $post->post_title;
+            $html .= "<a href='$url' target='_blank'>$postTitle</a><br>";
+        }
+
+        return $html;
+    }
+
+    public static function getTemplateDataRowCount(): ?string
+    {
+        $instance = new Database();
+
+        $table = $instance->getTemplateTableName();
+        $sql = "SELECT count(*) as total_rows FROM {$table}";
+
+        return $instance->wpdb->get_var($sql);
+    }
+
 
 	/**
 	 * Returns a single event, joining Acme Templates, Acme Events and Acme Calendars and linked Posts

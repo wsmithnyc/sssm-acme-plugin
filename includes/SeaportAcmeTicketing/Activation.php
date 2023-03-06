@@ -80,6 +80,21 @@ class Activation {
 
             dbDelta($sql);
 
+            //sync log table
+            $table_name = $this->wpdb->prefix . Constants::TABLE_SYNC_LOG;
+
+            $sql = "CREATE TABLE {$table_name} (
+                id bigint NOT NULL AUTO_INCREMENT,
+   				object_type varchar(20) NOT NULL,
+   				status varchar(20) NOT NULL,
+   				started_at timestamp DEFAULT CURRENT_TIMESTAMP,
+   				ended_at timestamp,
+   				PRIMARY KEY (id),
+                INDEX (object_type)
+				) $charset_collate";
+
+            dbDelta($sql);
+
             //settings table
             $sql = "CREATE TABLE {$this->settings_table_name} (
    				name varchar(50) NOT NULL,

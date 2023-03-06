@@ -2,6 +2,9 @@
 
 namespace SeaportAcmeTicketing;
 
+use SeaportAcmeTicketing\Tables\EventTable;
+use SeaportAcmeTicketing\Tables\LogTable;
+
 class Admin {
 
 
@@ -15,15 +18,13 @@ class Admin {
 
     public static function acme_ticketing_events_page()
     {
-        $data = (new Database())->getEventTemplates();
-
-        $return = var_export($data, true);
-
         echo '<div class="wrap">
 			<h2>Acme Events List</h2>
 		</div>';
 
-        echo "<div class='wrap'>$return</div>";
+        $table = new EventTable();
+        $table->prepare_items();
+        $table->display();
     }
 
     public static function acme_ticketing_config_page()
@@ -59,6 +60,8 @@ class Admin {
 			<h2>Acme Ticketing System Log</h2>
 		</div>';
 
-        require_once (__DIR__ . '/../partials/activity_log.php');
+        $table = new LogTable();
+        $table->prepare_items();
+        $table->display();
     }
 }

@@ -32,6 +32,14 @@ function acme_ticketing_admin_css() {
     table.wp-list-table.fixed {
        table-layout: auto !important;
     }
+    
+    .column-short_description {
+        width: 25%;
+    }
+    
+    .column-linked_posts {
+        width: 12%;
+    }
 
   </style>';
 }
@@ -59,4 +67,3 @@ function acme_ticketing_sync_acme_data()
     (new Controller())->syncAcmeDataRequest();
 }
 
-add_filter( 'query_vars', 'acme_ticketing_query_vars', 1);
