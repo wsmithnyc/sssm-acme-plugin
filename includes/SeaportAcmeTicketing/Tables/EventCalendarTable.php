@@ -6,9 +6,10 @@ use SeaportAcmeTicketing\Database;
 use SeaportAcmeTicketing\Helpers;
 use WP_List_Table;
 
-class LogTable extends WP_List_Table
+class EventCalendarTable extends WP_List_Table
 {
     protected Database $database;
+    protected array $filters = [];
 
     function __construct()
     {
@@ -31,10 +32,10 @@ class LogTable extends WP_List_Table
     function get_columns(): array
     {
         return [
-            'id' => __('ID'),
-            'type' => __('Event Type'),
-            'message' => __('Message'),
-            'created_at' => __('Timestamp'),
+            'event_date' => __('Date'),
+            'name' => __('Event Name'),
+            'active' => __('Active'),
+            'id' => __('Template Id'),
         ];
     }
 
@@ -45,18 +46,21 @@ class LogTable extends WP_List_Table
     public function get_sortable_columns(): array
     {
         return [
-            'id' => ['id', true],
-            'type' => ['type', false],
+            'id' => ['id', false],
+            'name' => ['name', false],
+            'event_date' => ['event_date', true],
+            'active' => ['active', false],
         ];
     }
 
     function column_default($item, $column_name)
     {
         switch ($column_name) {
+            case 'active':
+                return ($item[$column_name] == 1) ? "Yes" : "No";
             case 'id':
-            case 'type':
-            case 'message':
-            case 'created_at':
+            case 'name':
+            case 'event_date':
             default:
                 return $item[$column_name];
         }
@@ -71,6 +75,8 @@ class LogTable extends WP_List_Table
         global $_wp_column_headers;
         $screen = get_current_screen();
 
+        $this->getFilters();
+
         $this->_column_headers = $this->get_column_info();
 
         $sortable = $this->get_sortable_columns();
@@ -78,13 +84,13 @@ class LogTable extends WP_List_Table
         $safeColumns = array_keys($sortable);
 
         /* -- Sort Ordering parameters -- */
-        $sortDirection = Helpers::getTableSortDirection();
-        $sortColumn = Helpers::getTableSortColumn($safeColumns);
+        $sortDirection = Helpers::getTableSortDirection('asc');
+        $sortColumn = Helpers::getTableSortColumn($safeColumns, 'event_date');
 
         /* -- Pagination parameters -- */
         //Number of elements in your table?
         //return the total number of affected rows
-        $totalItems = $this->database->getLogDataRowCount();
+        $totalItems = $this->database->getTemplateCalendarDataRowCount($this->filters);
         //How many to display per page?
         $perPage = 25;
         //Which page is this?
@@ -106,7 +112,6 @@ class LogTable extends WP_List_Table
         );
 
         $hidden = array();
-
         $primary  = 'id';
 
         /* -- Register the Columns -- */
@@ -116,12 +121,32 @@ class LogTable extends WP_List_Table
         $this->_column_headers = array($columns, $hidden, $sortable, $primary);
 
         /* -- Fetch the items -- */
-        $this->items = $this->database->getLogData(
-            $page, $perPage, $sortColumn, $sortDirection
-        );
+        $this->items = $this->database->getTemplateCalendar(
+            $page,
+            $perPage,
+            $sortColumn,
+            $sortDirection,
+            $this->filters);
     }
 
     public function no_items() {
         _e( 'No log events available.');
+    }
+
+    protected function getFilters()
+    {
+        $template_id = $_GET['template_id'] ?? null;
+        $template_id = substr($template_id, 0, 30);
+
+        if (!empty($template_id)) {
+            $this->filters['template_id'] = $template_id;
+        }
+
+        $active = $_GET['active'] ?? null;
+        $active = substr($active, 0, 1);
+
+        if ($active == '0' || $active == '1') {
+            $this->filters['active'] = (int)$active;
+        }
     }
 }

@@ -60,10 +60,17 @@ register_activation_hook(__FILE__, ['SeaportAcmeTicketing\Activation', 'do_activ
 
 register_uninstall_hook(    __FILE__, array( 'SeaportAcmeTicketing\Activation', 'do_uninstall' ) );
 
+/************************* Admin AJAX Methods *****************************/
 add_action( 'wp_ajax_sync_acme_data', 'acme_ticketing_sync_acme_data');
 
-function acme_ticketing_sync_acme_data()
+function acme_ticketing_sync_acme_data(): void
 {
     (new Controller())->syncAcmeDataRequest();
 }
 
+add_action( 'wp_ajax_sync_acme_post_data', 'acme_ticketing_sync_acme_meta_data');
+
+function acme_ticketing_sync_acme_meta_data(): void
+{
+    (new Controller())->syncAcmeMetaDataRequest();
+}

@@ -23,10 +23,19 @@ class Menus {
 		add_submenu_page(
 			self::PARENT_SLUG,
 			'Acme Ticketing: Events',
-			'Events',
+			'Templates',
 			'manage_options',
 			'acme_ticketing_events.php',
 			[ Admin::class, 'acme_ticketing_events_page' ]
+		);
+
+		add_submenu_page(
+			self::PARENT_SLUG,
+			'Acme Ticketing: Daily Calendar',
+			'Daily Calendar',
+			'manage_options',
+			'acme_ticketing_daily_calendar.php',
+			[ Admin::class, 'acme_ticketing_template_calendar' ]
 		);
 
 		add_submenu_page(

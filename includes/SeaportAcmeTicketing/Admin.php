@@ -2,6 +2,7 @@
 
 namespace SeaportAcmeTicketing;
 
+use SeaportAcmeTicketing\Tables\EventCalendarTable;
 use SeaportAcmeTicketing\Tables\EventTable;
 use SeaportAcmeTicketing\Tables\LogTable;
 
@@ -61,6 +62,19 @@ class Admin {
 		</div>';
 
         $table = new LogTable();
+        $table->prepare_items();
+        $table->display();
+    }
+
+    public static function acme_ticketing_template_calendar()
+    {
+        echo '<div class="wrap">
+			<h2>Acme Ticketing Template Calendar</h2>
+			<p>This report lists the days which event templates are active with a granularity of whole days. 
+			Events occurring multiple times per day will only be listed once per day.</p>
+		</div>';
+
+        $table = new EventCalendarTable();
         $table->prepare_items();
         $table->display();
     }

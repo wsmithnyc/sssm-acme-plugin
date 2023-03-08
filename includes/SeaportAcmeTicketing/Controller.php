@@ -5,6 +5,7 @@ namespace SeaportAcmeTicketing;
 
 
 use Envira\Utils\Exception;
+use SearchWP\Sources\Post;
 
 class Controller {
     protected $database;
@@ -42,7 +43,7 @@ class Controller {
      *
      * @return void
      */
-    public function syncAcmeDataRequest()
+    public function syncAcmeDataRequest(): void
     {
         echo json_encode($this->syncAcmeData());
     }
@@ -159,21 +160,44 @@ class Controller {
         return true;
     }
 
-    protected function calcMaxPages(object $response)
+    /**
+     * For Public Request Usage
+     * Echos the JSON response from syncing post meta data
+     *
+     * @return void
+     */
+    public function syncAcmeMetaDataRequest(): void
     {
-        if (empty($response->pagination)) {
-            return 1;
+        echo json_encode($this->syncPostEventData());
+    }
+
+    public function syncPostEventData()
+    {
+        $templates = $this->database->getActiveTemplates();
+        $postMeta = new PostMeta();
+
+        $postCount = 0;
+
+        foreach ($templates as $template) {
+            $postCount += $postMeta->updatePostsByTemplate($template);
         }
 
+        return ['posts' => $postCount];
+    }
+
+    protected function calcMaxPages(object $response): int
+    {
         if (
+            empty($response->pagination) ||
             empty($response->pagination->page) ||
             empty($response->pagination->pageSize) ||
             empty($response->pagination->count)
         ) {
+            //can't determine the max page, so assume 1 page
             return 1;
         }
 
-        return ceil($response->pagination->count / $response->pagination->pageSize);
+        return (int)ceil($response->pagination->count / $response->pagination->pageSize);
     }
 
 

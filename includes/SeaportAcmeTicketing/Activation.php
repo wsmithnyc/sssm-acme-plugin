@@ -135,7 +135,7 @@ class Activation {
             $table_name = $this->wpdb->prefix . Constants::TABLE_TEMPLATE_CALENDAR;
 
             $sql = "CREATE TABLE $table_name (
-    			id varchar(50) NOT NULL,
+    			id bigint NOT NULL AUTO_INCREMENT,
     			template_id varchar(50) NOT NULL,
    				event_date timestamp NOT NULL,
    				name varchar(100),

@@ -8,6 +8,8 @@ use WP_List_Table;
 
 class EventTable extends WP_List_Table
 {
+    protected $database;
+
     function __construct()
     {
         parent::__construct(
@@ -18,6 +20,8 @@ class EventTable extends WP_List_Table
                 'ajax' => false //We won't support Ajax for this table
             ]
         );
+
+        $this->database = new Database();
     }
 
     /**
@@ -30,7 +34,7 @@ class EventTable extends WP_List_Table
             'id' => __('Template Id'),
             'name' => __('Event Name'),
             'short_description' => __('Short Description'),
-            'linked_posts' => __('Linked Posts'),
+            'linked_posts' => __('Linked PostMeta'),
             'admission_type' => __('Admission Type'),
             'review_state' => __('Status'),
             'starts_at' => __('Starts'),
@@ -86,14 +90,15 @@ class EventTable extends WP_List_Table
         $safeColumns = array_keys($sortable);
 
         /* -- Sort Ordering parameters -- */
-        $sortDirection = Helpers::getTableSortDirection();
-        $sortColumn = Helpers::getTableSortColumn($safeColumns);
+        $sortDirection = Helpers::getTableSortDirection('asc');
+        $sortColumn = Helpers::getTableSortColumn($safeColumns, 'name');
 
         /* -- Pagination parameters -- */
         //Number of elements in your table?
         //return the total number of affected rows
-        $totalItems = Database::getTemplateDataRowCount();
+        $totalItems = $this->database->getTemplateDataRowCount();
         //How many to display per page?
+
         $perPage = 25;
         //Which page is this?
         $page = Helpers::getTablePage();
@@ -123,7 +128,7 @@ class EventTable extends WP_List_Table
         $this->_column_headers = array($columns, $hidden, $sortable, $primary);
 
         /* -- Fetch the items -- */
-        $this->items = (new Database())->getEventTemplates($page, $perPage, $sortColumn, $sortDirection);
+        $this->items = $this->database->getEventTemplates($page, $perPage, $sortColumn, $sortDirection);
     }
 
     public function no_items() {
