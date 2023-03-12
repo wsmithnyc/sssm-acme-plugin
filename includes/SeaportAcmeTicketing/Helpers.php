@@ -42,17 +42,4 @@ class Helpers {
 
         return (int)ceil($count / $perPage);
     }
-
-    /**
-     * Get the URL for the Book Now buttons
-     * Provide template id to link to specific event
-     *
-     * @param $templateId
-     * @return string
-     */
-    public static function getBookingUrl($templateId): string
-    {
-        //temp URL
-       return "https://buy.acmeticketing.com/orders/548/calendar?eventId={$templateId}&cart";
-    }
 }

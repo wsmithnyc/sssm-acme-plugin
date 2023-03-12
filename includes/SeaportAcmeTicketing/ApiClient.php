@@ -27,7 +27,6 @@ class ApiClient {
 
 		//get api key from settings
         $this->apiKey = Database::getSettings(Constants::SETTING_API_KEY);
-
     }
 
 	//*********************************  Acme API Endpoints **********************************/
@@ -135,5 +134,4 @@ class ApiClient {
 
         return $response;
     }
-
 }

@@ -16,7 +16,7 @@ class Menus {
 			'manage_options',
 			self::PARENT_SLUG,
 			[ Admin::class, 'acme_ticketing_admin_page' ],
-			'dashicons-tickets',
+			'dashicons-tickets-alt',
 			6
 		);
 

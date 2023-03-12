@@ -18,7 +18,7 @@ function sync_action_javascript(): void
             jQuery('#sync_status').html('<h3>Response</h3><p>Syncing Data...</p>');
 
             jQuery.post('/wp-admin/admin-ajax.php', data, function(response) {
-                jQuery('#sync_status').html('<h3>Response</h3>' + response);
+                jQuery('#sync_status').html('<h3>Response</h3>');
             });
         }
 

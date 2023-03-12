@@ -3,20 +3,19 @@
 namespace SeaportAcmeTicketing;
 
 
-
 use Envira\Utils\Exception;
-use SearchWP\Sources\Post;
 
-class Controller {
-    protected $database;
-    protected $apiClient;
-    protected $dataImport;
+class Controller
+{
+    protected Database $database;
+    protected ApiClient $apiClient;
+    protected AcmeDataImport $dataImport;
 
     public function __construct()
     {
-        $this->database = new Database();
-        $this->apiClient = new ApiClient();
-        $this->dataImport = new AcmeDataImport($this->database);
+        $this->database   = new Database();
+        $this->apiClient  = new ApiClient();
+        $this->dataImport = new AcmeDataImport( $this->database );
     }
 
     /**
@@ -45,7 +44,7 @@ class Controller {
      */
     public function syncAcmeDataRequest(): void
     {
-        echo json_encode($this->syncAcmeData());
+        echo json_encode( $this->syncAcmeData() );
     }
 
     /**
@@ -57,26 +56,21 @@ class Controller {
      */
     protected function syncTemplateData(): bool
     {
-        try {
-            $errors = 0;
+        $errors = 0;
 
-            $response = $this->apiClient->getTemplates();
+        $response = $this->apiClient->getTemplates();
 
-            $response = json_decode($response);
+        $response = json_decode( $response );
 
-            if (is_array($response)) {
-                $errors = $this->dataImport->syncTemplatesData($response);
-            }
-
-            if (!empty($errors)) {
-                Log::warning("syncTemplateData experience {$errors} errors.");
-            }
-
-            return ($errors == 0);
-        } catch (Exception $exception) {
-            Log::exception($exception);
-            return false;
+        if ( is_array( $response ) ) {
+            $errors = $this->dataImport->syncTemplatesData( $response );
         }
+
+        if ( ! empty( $errors ) ) {
+            Log::warning( "syncTemplateData experience $errors errors." );
+        }
+
+        return ( $errors == 0 );
     }
 
     /**
@@ -91,70 +85,60 @@ class Controller {
     {
         ///v1/b2c/event/templates/{63dec5f6176b2e180764bc6a}/calendar
         /// The templateID is provided as a route parameter to the Acme API
-        try {
-            $templateIds = $this->database->getTemplateIds();
 
-            foreach ($templateIds as $templateId) {
-                $response = $this->apiClient->getCalendarByTemplateId($templateId);
+        $templateIds = $this->database->getTemplateIds();
 
-                $response = json_decode($response);
+        foreach ( $templateIds as $templateId ) {
+            $response = $this->apiClient->getCalendarByTemplateId( $templateId );
 
-                if (!empty($response->days)) {
-                    //days is an array of all the day objects for the given template
-                    foreach ($response->days as $day) {
-                        $this->dataImport->saveTemplateCalendarByTemplateId($day, $templateId);
-                    }
+            $response = json_decode( $response );
+
+            if ( ! empty( $response->days ) ) {
+                //days is an array of all the day objects for the given template
+                foreach ( $response->days as $day ) {
+                    $this->dataImport->saveTemplateCalendarByTemplateId( $day, $templateId );
                 }
             }
-
-            return true;
-        } catch (Exception $exception) {
-            Log::exception($exception);
         }
 
-        return false;
+        return true;
     }
 
     /**
-     * Sync the Event Calendar. The event calendar gives granualar details
+     * Sync the Event Calendar. The event calendar gives granular details
      * on the schedule for an event.
      *
      * @param int|null $page
+     *
      * @return bool
      */
-    protected function syncEventCalendar(?int $page = 1): bool
+    protected function syncEventCalendar( ?int $page = 1 ): bool
     {
         // page=3&sortField=startTime&pageSize=200
         // /v2/b2b/event/instances/statements
 
         $params = [
             'sortField' => 'startTime',
-            'pageSize' => 200,
-            'page' => $page,
+            'pageSize'  => 200,
+            'page'      => $page,
         ];
 
-        try {
-            $response = $this->apiClient->getEventCalendarStatements($params);
+        $response = $this->apiClient->getEventCalendarStatements( $params );
 
-            $response = json_decode($response);
+        $response = json_decode( $response );
 
-            $list = $response?->list ?? [];
+        $list = $response?->list ?? [];
 
-            $maxPages = $this->calcMaxPages($response);
+        $maxPages = $this->calcMaxPages( $response );
 
-            if (!empty($list)) {
-                foreach ($list as $item) {
-                    $this->dataImport->saveEventCalendar($item);
-                }
-
-                if ($page <= $maxPages) {
-                    $this->syncEventCalendar($page + 1);
-                }
+        if ( ! empty( $list ) ) {
+            foreach ( $list as $item ) {
+                $this->dataImport->saveEventCalendar( $item );
             }
 
-        } catch (Exception $exception) {
-            Log::exception($exception);
-            return false;
+            if ( $page <= $maxPages ) {
+                $this->syncEventCalendar( $page + 1 );
+            }
         }
 
         return true;
@@ -162,42 +146,49 @@ class Controller {
 
     /**
      * For Public Request Usage
-     * Echos the JSON response from syncing post meta data
+     * Echos the JSON response from syncing post metadata
      *
-     * @return void
+     * @return string
      */
-    public function syncAcmeMetaDataRequest(): void
+    public function syncAcmeMetaDataRequest(): string
     {
-        echo json_encode($this->syncPostEventData());
+        return $this->syncPostEventData();
     }
 
-    public function syncPostEventData()
+    public function syncPostEventData(): string
     {
         $templates = $this->database->getActiveTemplates();
-        $postMeta = new PostMeta();
+        $postMeta  = new PostMeta();
 
-        $postCount = 0;
+        $return = [];
 
-        foreach ($templates as $template) {
-            $postCount += $postMeta->updatePostsByTemplate($template);
+        foreach ( $templates as $template ) {
+            $postCount = $postMeta->updatePostsByTemplate( $template );
+            $return[]  = [ 'id' => $template->id, 'name' => $template->name, 'posts' => $postCount ];
         }
 
-        return ['posts' => $postCount];
+        $html = "\n<tr><th>Template ID</th><th>Event Name</th><th>Linked Posts</th></tr>\n";
+
+        foreach ( $return as $row ) {
+            $html .= "<tr><td>{$row['id']}</td><td>{$row['name']}</td><td>{$row['posts']}</td></tr>\n";
+        }
+
+        return "<table style='width: 600px;'>$html</table>\n";
     }
 
-    protected function calcMaxPages(object $response): int
+    protected function calcMaxPages( object $response ): int
     {
         if (
-            empty($response->pagination) ||
-            empty($response->pagination->page) ||
-            empty($response->pagination->pageSize) ||
-            empty($response->pagination->count)
+            empty( $response->pagination ) ||
+            empty( $response->pagination->page ) ||
+            empty( $response->pagination->pageSize ) ||
+            empty( $response->pagination->count )
         ) {
             //can't determine the max page, so assume 1 page
             return 1;
         }
 
-        return (int)ceil($response->pagination->count / $response->pagination->pageSize);
+        return (int) ceil( $response->pagination->count / $response->pagination->pageSize );
     }
 
 
@@ -206,7 +197,7 @@ class Controller {
 
     }
 
-    public function getCalendarByTemplateId(string $templateId)
+    public function getCalendarByTemplateId( string $templateId )
     {
 
     }
@@ -216,12 +207,12 @@ class Controller {
 
     }
 
-    public function logSyncStatusStart(string $objectType)
+    public function logSyncStatusStart( string $objectType )
     {
 
     }
 
-    public function logSyncStatusStop(int $syncLogId)
+    public function logSyncStatusStop( int $syncLogId )
     {
 
     }

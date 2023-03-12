@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use wpdb;
 
 class AcmeDataImport {
-    protected $database;
+    protected Database $database;
 
     public function __construct(?Database $database = null)
     {
@@ -17,7 +17,8 @@ class AcmeDataImport {
      * Returns the number of errors encountered.
      * 0 errors would be 100% successful
      *
-     * @param array|null $templates
+     * @param array|object|null $templates
+     *
      * @return int
      */
     public function syncTemplatesData(array|object|null $templates = []): int

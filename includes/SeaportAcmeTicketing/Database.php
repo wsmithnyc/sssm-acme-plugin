@@ -206,7 +206,7 @@ class Database {
      * @param Carbon|null $to
      * @return array|object|null
      */
-    public function getCalenderbyTemplateID(string $templateId, ?Carbon $from = null, Carbon $to = null): array|object|null
+    public function getCalenderByTemplateID(string $templateId, ?Carbon $from = null, Carbon $to = null): array|object|null
     {
         $filters = [$templateId];
         $criteria = 'WHERE active = 1 AND template_id = %s';
@@ -248,6 +248,24 @@ class Database {
         }
 
         return $list;
+    }
+
+
+    /**
+     * Get the count of events for a given template ID.
+     *
+     * @param string $templateId
+     *
+     * @return int
+     */
+    public function getEventCountByTemplateId(string $templateId): int
+    {
+        $table = $this->getTemplateCalendarTableName();
+        $sql = "SELECT count(*) as event_count FROM $table WHERE template_id = %s";
+
+        $sql = $this->wpdb->prepare($sql, $templateId);
+
+        return (int)$this->wpdb->get_var($sql);
     }
 
     /************************** WordPress PostMeta Queries **********************/
