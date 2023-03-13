@@ -239,7 +239,27 @@ class Activation {
             $this->settings_table_name,
             array(
                 'name' => Constants::SETTING_API_BASE_URL,
-                'value' => 'https://api.acmeticketing.com/',
+                'value' => 'https://api.acmeticketing.com',
+                'created_at' => $now,
+                'updated_at' => $now,
+            )
+        );
+
+        $this->wpdb->insert(
+            $this->settings_table_name,
+            array(
+                'name' => Constants::SETTING_ACME_CUSTOMER_ID,
+                'value' => '548',
+                'created_at' => $now,
+                'updated_at' => $now,
+            )
+        );
+
+        $this->wpdb->insert(
+            $this->settings_table_name,
+            array(
+                'name' => Constants::SETTING_TICKET_BASE_URL,
+                'value' => 'https://tickets.southstreetseaportmuseum.org',
                 'created_at' => $now,
                 'updated_at' => $now,
             )
