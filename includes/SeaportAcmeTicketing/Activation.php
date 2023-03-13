@@ -7,11 +7,11 @@ use wpdb;
 use Carbon\Carbon;
 use function dbDelta;
 
-
 class Activation {
 	const PLUGIN_DB_OPTION = 'acme_ticketing_db_version';
 
     public wpdb $wpdb;
+    public Database $database;
 
     public string $settings_table_name;
 
@@ -19,19 +19,21 @@ class Activation {
 	{
         //WordPress database class
         global $wpdb;
-
 		$this->wpdb = $wpdb;
+
+        //Database class
+        $this->database = new Database();
 
         //settings table
         $this->settings_table_name = (new Database())->settings_table_name;
 	}
 
-    public static function do_activation()
+    public static function do_activation(): void
     {
         (new Activation())->activate();
     }
 
-    public static function do_uninstall()
+    public static function do_uninstall(): void
     {
         (new Activation())->uninstall();
     }
@@ -67,7 +69,7 @@ class Activation {
 
         try {
             //log table
-            $table_name = $this->wpdb->prefix . Constants::TABLE_LOG;
+            $table_name = $this->database->getLogTableName();
 
             $sql = "CREATE TABLE {$table_name} (
                 id bigint NOT NULL AUTO_INCREMENT,
@@ -81,9 +83,9 @@ class Activation {
             dbDelta($sql);
 
             //sync log table
-            $table_name = $this->wpdb->prefix . Constants::TABLE_SYNC_LOG;
+            $table_name = $this->database->getSyncLogTableName();
 
-            $sql = "CREATE TABLE {$table_name} (
+            $sql = "CREATE TABLE $table_name (
                 id bigint NOT NULL AUTO_INCREMENT,
    				object_type varchar(20) NOT NULL,
    				status varchar(20) NOT NULL,
@@ -95,8 +97,10 @@ class Activation {
 
             dbDelta($sql);
 
+            $table_name = $this->database->getSettingTableName();
+
             //settings table
-            $sql = "CREATE TABLE {$this->settings_table_name} (
+            $sql = "CREATE TABLE $table_name (
    				name varchar(50) NOT NULL,
    				value varchar(500) NOT NULL,
    				created_at timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -107,7 +111,7 @@ class Activation {
             dbDelta($sql);
 
             //acme template table
-            $table_name = $this->wpdb->prefix . Constants::TABLE_TEMPLATE;
+            $table_name = $this->database->getTemplateTableName();
 
             $sql = "CREATE TABLE $table_name (
     			id varchar(50) NOT NULL,
@@ -132,7 +136,7 @@ class Activation {
             //acme template calendar table
             //use this for by-the-day searches
             //populated from /v1/b2c/event/templates/{template_id}/calendar
-            $table_name = $this->wpdb->prefix . Constants::TABLE_TEMPLATE_CALENDAR;
+            $table_name = $this->database->getTemplateCalendarTableName();
 
             $sql = "CREATE TABLE $table_name (
     			id bigint NOT NULL AUTO_INCREMENT,
@@ -150,7 +154,7 @@ class Activation {
 
             //acme event calendar table
             //populated from /v2/b2b/event/instances/statements
-            $table_name = $this->wpdb->prefix . Constants::TABLE_EVENT_CALENDAR;
+            $table_name = $this->database->getEventCalenderTableName();
 
             $sql = "CREATE TABLE $table_name (
     			id varchar(50) NOT NULL,
@@ -244,17 +248,26 @@ class Activation {
 
     public function uninstall_tables(): void
     {
-        $tables = [
+        //set sync active to off
+        $this->wpdb->update(
             $this->settings_table_name,
-            $this->wpdb->prefix . Constants::TABLE_SETTINGS,
-            $this->wpdb->prefix . Constants::TABLE_EVENT_CALENDAR,
-            $this->wpdb->prefix . Constants::TABLE_TEMPLATE_CALENDAR,
-            $this->wpdb->prefix . Constants::TABLE_TEMPLATE,
-            $this->wpdb->prefix . Constants::TABLE_LOG,
+            ['value' => 'N'],
+            ['name' => Constants::SETTING_SYNC_ACTIVE]
+        );
+
+        sleep(20);
+
+        $tables = [
+            $this->database->getEventCalenderTableName(),
+            $this->database->getTemplateTableName(),
+            $this->database->getLogTableName(),
+            $this->database->getSettingTableName(),
+            $this->database->getTemplateCalendarTableName(),
+            $this->database->getSyncLogTableName(),
         ];
 
-        foreach ($tables as $tablename) {
-            $this->wpdb->query("DROP TABLE IF EXISTS $tablename");
+        foreach ($tables as $table_name) {
+            $this->wpdb->query("DROP TABLE IF EXISTS $table_name");
         }
 
         delete_option(self::PLUGIN_DB_OPTION);

@@ -27,6 +27,14 @@ class Controller
      */
     public function syncAcmeData(): array
     {
+        if (! Database::isSyncActive()) {
+            $ret['template_status'] = false;
+            $ret['template_calendar_status'] = false;
+            $ret['event_calendar_status'] = false;
+            $ret['error'] = 'Sync not active';
+            return $ret;
+        }
+
         $ret['template_status'] = $this->syncTemplateData();
 
         $ret['template_calendar_status'] = $this->syncTemplateCalendar();

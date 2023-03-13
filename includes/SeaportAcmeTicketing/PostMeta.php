@@ -40,8 +40,10 @@ class PostMeta {
 
     public function updatePostCustomFields(WP_Post $post, object $template): void
     {
-        //set the active event calendar dates
-        $this->updatePostEventDates($post, $template);
+        if (! Database::isSyncActive()) {
+            return;
+        }
+
         //set the event description
         $this->updatePostDescription($post, $template);
         //set the event short description
@@ -54,6 +56,14 @@ class PostMeta {
         $this->addEventDescriptionShortcodeToLinkedPost($post);
         //add the hide event text custom field, defaulting to "N" if not already set
         $this->updatePostHideData($post);
+
+        //this take a while, so check if we are still active
+        if (! Database::isSyncActive()) {
+            return;
+        }
+
+        //set the active event calendar dates
+        $this->updatePostEventDates($post, $template);
         //add a Tag for "This Week" if the post's event occurs at least once during the current week
         $this->setTagThisWeek($post, $template);
     }

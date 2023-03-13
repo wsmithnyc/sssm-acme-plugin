@@ -386,6 +386,13 @@ class Database {
         return (empty($key)) ? $settings :  $settings[$key] ?? '';
 	}
 
+    public static function isSyncActive(): bool
+    {
+        $value = self::getSettings(Constants::SETTING_SYNC_ACTIVE);
+
+        return ($value == 'Y');
+    }
+
     /**
      * Loads the settings from the plugin database table
      * @return array
@@ -440,5 +447,10 @@ class Database {
     public function getSettingTableName()
     {
         return $this->wpdb->prefix . Constants::TABLE_SETTINGS;
+    }
+
+    public function getSyncLogTableName()
+    {
+        return $this->wpdb->prefix . Constants::TABLE_SYNC_LOG;
     }
 }
